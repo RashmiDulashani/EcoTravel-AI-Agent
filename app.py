@@ -17,6 +17,17 @@ st.set_page_config(
     layout="wide"
 )
 
+import os
+
+# --- Auto-build the Chroma vector store on first run (needed for cloud deployment,
+# since data/chroma_db/ is gitignored and won't exist in a fresh deployment) ---
+CHROMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "chroma_db")
+
+if not os.path.exists(CHROMA_DIR):
+    with st.spinner("🌿 First-time setup: building knowledge base (this takes ~1-2 minutes)..."):
+        from rag.ingest import run_ingestion
+        run_ingestion()
+
 # --- Session State Initialization ---
 # Streamlit re-runs the whole script on every interaction, so we use
 # session_state to remember chat history across reruns.
