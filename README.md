@@ -2,7 +2,7 @@
 
 An agentic AI application that plans sustainable, multi-day travel itineraries for Sri Lanka, grounded in a domain-specific knowledge base and built on a multi-agent architecture with Retrieval-Augmented Generation (RAG).
 
-**✈️ Live demo:** {EcoTravel AI on Streamlit](https://ecotravel-ai-agent.streamlit.app/)
+**✈️ Live demo:** [EcoTravel AI on Streamlit](https://ecotravel-ai-agent.streamlit.app/)
 
 ---
 
@@ -137,7 +137,6 @@ Two different LLMs are used deliberately for different sub-tasks, configured in 
 | Reflection / self-critique | Llama 3.1 8B Instant (Groq) | Extremely low | Very low | 128K tokens | Sufficient for checklist-style evaluation | Critiquing against 3 explicit criteria is a bounded, structured judgment task - doesn't need frontier-model reasoning, and running it cheaply matters since it can be called multiple times per retry loop |
 | Trip planning / final itinerary generation | Claude Haiku 4.5 (OpenRouter) | Moderate (~1–3s) | Low-moderate - Haiku-tier pricing | 200K tokens | Strong - handles multi-constraint synthesis (budget + duration + interests + sustainability) noticeably better than the 8B model | Itinerary generation requires balancing multiple constraints and producing coherent, non-generic prose grounded in retrieved context - worth the extra cost/latency over the fast model |
 
-**Design principle:** the same model is never used for everything. Cheap/fast tasks (routing, critique) use Groq; the single most reasoning-intensive task (planning) uses the stronger OpenRouter model.
 ---
 
 ## 📚 RAG Pipeline
@@ -146,7 +145,7 @@ Two different LLMs are used deliberately for different sub-tasks, configured in 
 1. **Document loading** - `DirectoryLoader` + `TextLoader` (and optionally `PyPDFLoader` for PDF sources) recursively load all documents from `data/`.
 2. **Chunking** - `RecursiveCharacterTextSplitter` with `chunk_size=1000`, `chunk_overlap=200`. This size preserves a full idea per chunk (roughly one paragraph) without diluting embedding precision; the 200-character overlap (~20%) prevents important sentences from being cut across chunk boundaries.
 3. **Embedding** - `sentence-transformers/all-MiniLM-L6-v2`: a small (~80MB), CPU-friendly model producing 384-dimensional vectors, chosen for fast inference and low storage cost at acceptable quality for this knowledge base size.
-4. **Vector store** - ChromaDB, persisted to `data/chroma_db/` (excluded from git via `.gitignore`; rebuilt automatically on first run in deployment — see `app.py`).
+4. **Vector store** - ChromaDB, persisted to `data/chroma_db/` (excluded from git via `.gitignore`; rebuilt automatically on first run in deployment - see `app.py`).
 
 ---
 
